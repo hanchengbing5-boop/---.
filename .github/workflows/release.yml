@@ -11,6 +11,10 @@ jobs:
   release:
     runs-on: windows-latest
     steps:
+      - name: Prepare Windows workspace
+        shell: pwsh
+        working-directory: ${{ runner.temp }}
+        run: New-Item -ItemType Directory -Path $env:GITHUB_WORKSPACE -Force | Out-Null
       - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v6
         with:
@@ -38,4 +42,3 @@ jobs:
             dist/SHA256SUMS.txt
           body: |
             Windows 10 (2004+) / Windows 11，x64。安装版会创建桌面和开始菜单入口；便携版可直接运行。手机实际出声和 AAC 编码需在目标设备验证。
-
