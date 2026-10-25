@@ -1,0 +1,104 @@
+<Window x:Class="BluetoothAudioReceiver.TroubleshootWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="无声音？检查与修复" Width="500" Height="550"
+        WindowStartupLocation="CenterOwner" WindowStyle="None"
+        AllowsTransparency="True" ResizeMode="NoResize" Background="Transparent">
+    <Border Background="#101722" BorderBrush="#304158" BorderThickness="1" CornerRadius="16">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="52"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="#182538" CornerRadius="16,16,0,0"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid Margin="18,0,10,0">
+                    <TextBlock Text="无声音？检查与修复" FontSize="15" FontWeight="SemiBold"
+                               Foreground="White" VerticalAlignment="Center"/>
+                    <Button Content="×" Click="CloseButton_Click" Style="{StaticResource CloseButtonStyle}"
+                            HorizontalAlignment="Right" FontSize="18" Foreground="#B9C8D8"
+                            ToolTip="关闭"/>
+                </Grid>
+            </Border>
+
+            <ScrollViewer x:Name="ContentScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="22,18,22,14">
+                <StackPanel>
+                    <TextBlock Text="连接检查" FontSize="15" FontWeight="SemiBold" Foreground="White"
+                               Margin="0,0,0,11"/>
+
+                    <Border Background="#1A2A3C" BorderBrush="#304762" BorderThickness="1"
+                            CornerRadius="11" Padding="14" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="手机蓝牙连接" Foreground="#A8C0D9" FontSize="11"/>
+                            <TextBlock x:Name="BluetoothText" Foreground="White" FontSize="13"
+                                       TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#1A2A3C" BorderBrush="#304762" BorderThickness="1"
+                            CornerRadius="11" Padding="14" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="Windows 音频接收通道" Foreground="#A8C0D9" FontSize="11"/>
+                            <TextBlock x:Name="ChannelText" Foreground="White" FontSize="13"
+                                       TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#1A2A3C" BorderBrush="#304762" BorderThickness="1"
+                            CornerRadius="11" Padding="14" Margin="0,0,0,14">
+                        <StackPanel>
+                            <TextBlock Text="电脑当前默认声音输出" Foreground="#A8C0D9" FontSize="11"/>
+                            <TextBlock x:Name="OutputText" Foreground="White" FontSize="13"
+                                       TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#1A2A3C" BorderBrush="#304762" BorderThickness="1"
+                            CornerRadius="11" Padding="14" Margin="0,0,0,14">
+                        <StackPanel>
+                            <TextBlock Text="其他蓝牙音频接收应用" Foreground="#A8C0D9" FontSize="11"/>
+                            <TextBlock x:Name="OtherAppText" Foreground="White" FontSize="13"
+                                       TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#223950" CornerRadius="11" Padding="14">
+                        <StackPanel>
+                            <TextBlock Text="下一步" Foreground="#9FD0FB" FontSize="11" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="RecommendationText" Foreground="White" FontSize="12"
+                                       TextWrapping="Wrap" LineHeight="19" Margin="0,6,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Text="提示：通道显示已打开，也不能证明手机正在发送声音。请在手机播放媒体时检查其音频输出选项。"
+                               Foreground="#92A9BF" FontSize="11" TextWrapping="Wrap"
+                               Margin="2,13,2,0"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Border Grid.Row="2" Background="#182538" CornerRadius="0,0,16,16" Padding="18,13">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="9"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="RepairButton" Content="重新建立接收通道"
+                                Click="RepairButton_Click" Style="{StaticResource PrimaryButtonStyle}"
+                                Padding="9,9"/>
+                        <Button Grid.Column="2" Content="打开 Windows 声音设置"
+                                Click="OpenSoundSettings_Click" Style="{StaticResource SecondaryButtonStyle}"
+                                Padding="9,9"/>
+                    </Grid>
+                    <Grid Margin="0,8,0,0">
+                        <Button Content="重新检查" Click="RefreshButton_Click" Background="Transparent"
+                                BorderThickness="0" Foreground="#9FCBF1" Cursor="Hand"
+                                HorizontalAlignment="Left"/>
+                        <Button Content="复制诊断信息" Click="CopyDiagnostics_Click" Background="Transparent"
+                                BorderThickness="0" Foreground="#9FCBF1" Cursor="Hand"
+                                HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

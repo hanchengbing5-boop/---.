@@ -1,0 +1,41 @@
+name: Build and publish Windows app
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build self-contained app
+        shell: pwsh
+        run: dotnet publish .\BluetoothAudioReceiver.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+      - name: Prepare downloads
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Copy-Item -LiteralPath publish\PhoneAudioReceiver.exe -Destination dist\PhoneAudioReceiver-Portable.exe
+          .\scripts\Build-Installer.ps1 -PublishedExe publish\PhoneAudioReceiver.exe -Output dist\PhoneAudioReceiver-Setup.exe
+          Get-FileHash -Algorithm SHA256 dist\*.exe | ForEach-Object { "{0}  {1}" -f $_.Hash, (Split-Path $_.Path -Leaf) } | Set-Content dist\SHA256SUMS.txt
+      - name: Publish release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: 手机音频接收器 v1.0.${{ github.run_number }}
+          make_latest: true
+          fail_on_unmatched_files: true
+          files: |
+            dist/PhoneAudioReceiver-Portable.exe
+            dist/PhoneAudioReceiver-Setup.exe
+            dist/SHA256SUMS.txt
+          body: |
+            Windows 10 (2004+) / Windows 11，x64。安装版会创建桌面和开始菜单入口；便携版可直接运行。手机实际出声和 AAC 编码需在目标设备验证。
+

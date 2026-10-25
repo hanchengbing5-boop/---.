@@ -1,0 +1,162 @@
+<Window x:Class="BluetoothAudioReceiver.DeviceInventoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设备总览 · 手机音频接收器" Width="660" Height="690"
+        MinWidth="560" MinHeight="550" WindowStartupLocation="CenterOwner"
+        WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize"
+        Background="Transparent" Foreground="White" FontFamily="Segoe UI Variable Display, Segoe UI"
+        Loaded="Window_Loaded" Closed="Window_Closed">
+    <Window.Resources>
+        <Style x:Key="FilterStyle" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="#B6CADF"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Pill" Background="#202F43" BorderBrush="#34475F"
+                                BorderThickness="1" CornerRadius="8" Padding="10,7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="#295781"/>
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="#56B3FF"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,0,0,9"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="AutomationProperties.Name" Value="{Binding Name}"/>
+        </Style>
+    </Window.Resources>
+    <Border Background="#101722" BorderBrush="#304158" BorderThickness="1" CornerRadius="18">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="49"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Background="#182538" CornerRadius="18,18,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid Margin="19,0,12,0">
+                <TextBlock Text="⌁  设备总览" VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold"/>
+                <Button Content="×" HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Click="Close_Click" Style="{StaticResource CloseButtonStyle}"
+                        Foreground="#B9C8D8" FontSize="18" AutomationProperties.Name="关闭设备总览"/>
+            </Grid>
+        </Border>
+    <Grid Grid.Row="1" Margin="28,22,28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <StackPanel>
+                <TextBlock Text="设备总览" FontSize="26" FontWeight="SemiBold"/>
+                <TextBlock Text="蓝牙设备与 USB 输入接收器，一眼看清连接情况"
+                           FontSize="12" Foreground="#A9BED5" Margin="0,6,0,0"/>
+            </StackPanel>
+            <Button Content="⟳  刷新设备" HorizontalAlignment="Right" VerticalAlignment="Center"
+                    Style="{StaticResource SecondaryButtonStyle}" Click="Refresh_Click"/>
+        </Grid>
+        <Border Grid.Row="1" Margin="0,20,0,17" Padding="16,12" CornerRadius="12"
+                Background="#192D43" BorderBrush="#345676" BorderThickness="1">
+            <StackPanel>
+                <TextBlock x:Name="CountText" Text="正在查找设备…" FontSize="15" FontWeight="SemiBold"/>
+                <TextBlock Text="只有“手机音频”列表中的设备可用来接收手机声音。"
+                           Foreground="#A9C5DF" FontSize="11" Margin="0,5,0,0"/>
+            </StackPanel>
+        </Border>
+        <Grid Grid.Row="2" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="168"/>
+            </Grid.ColumnDefinitions>
+            <Grid Margin="0,0,12,0">
+                <TextBox x:Name="SearchBox" TextChanged="Filter_Changed"
+                         Height="35" VerticalContentAlignment="Center" Padding="10,0"
+                         Background="#1B293A" Foreground="White" CaretBrush="White"
+                         BorderBrush="#405873" ToolTip="输入设备名称搜索"
+                         AutomationProperties.Name="搜索设备"/>
+                <TextBlock Text="搜索设备名称" Margin="11,0,0,0" Foreground="#8199B0"
+                           VerticalAlignment="Center" IsHitTestVisible="False">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <RadioButton x:Name="AllFilter" GroupName="KindFilter" Content="全部" IsChecked="True"
+                             Style="{StaticResource FilterStyle}" Checked="Filter_Changed"/>
+                <RadioButton x:Name="BluetoothFilter" GroupName="KindFilter" Content="蓝牙"
+                             Style="{StaticResource FilterStyle}" Checked="Filter_Changed"/>
+                <RadioButton x:Name="UsbFilter" GroupName="KindFilter" Content="USB"
+                             Style="{StaticResource FilterStyle}" Checked="Filter_Changed" Margin="0"/>
+            </StackPanel>
+        </Grid>
+        <Border Grid.Row="3" Background="#172231" CornerRadius="14" Padding="10"
+                BorderBrush="#2B3B4F" BorderThickness="1">
+            <Grid>
+                <ListBox x:Name="DeviceList" Background="Transparent" BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#202F43" BorderBrush="#34475F" BorderThickness="1"
+                                    CornerRadius="11" Padding="13,11">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="42"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Width="36" Height="36" CornerRadius="10" Background="#315879" VerticalAlignment="Center">
+                                        <TextBlock Text="⌁" Foreground="#D6EDFF" FontSize="22"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Margin="10,0,8,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" Foreground="White"/>
+                                        <TextBlock Text="{Binding Kind}" FontSize="11" Foreground="#8FC8F5" Margin="0,3,0,0"/>
+                                        <TextBlock Text="{Binding Detail}" FontSize="10" Foreground="#A7BDD3"
+                                                   TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                    <Border Grid.Column="2" Background="#284638" CornerRadius="8" Padding="8,4"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Status}" FontSize="10" Foreground="#A5E7C8"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock x:Name="EmptyText" Text="还没有找到符合条件的设备" Foreground="#9DB2C9"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+            </Grid>
+        </Border>
+        <TextBlock Grid.Row="4" Margin="2,13,2,0" FontSize="11" Foreground="#91A9C0"
+                   TextWrapping="Wrap" Text="提示：Windows 无法统一识别私有 2.4G 协议。USB 输入列表包括可能使用 2.4G 接收器的设备，也可能包括有线设备。"/>
+    </Grid>
+    </Grid>
+    </Border>
+</Window>
